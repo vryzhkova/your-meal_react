@@ -2,10 +2,28 @@ import classNames from "classnames";
 import style from "./ModalDelivery.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../store/modalDelivery/modalDeliverySlice";
+import { submitForm, updateFormValue } from "../../store/form/formSlice";
 
 export const ModalDelivery = () => {
   const { isOpen } = useSelector((state) => state.modal);
+  const form = useSelector((state) => state.form);
+  const { orderList } = useSelector((state) => state.order);
+
   const dispatch = useDispatch();
+
+  const hahdleInputChange = (e) => {
+    dispatch(
+      updateFormValue({
+        field: e.target.name,
+        value: e.target.value,
+      })
+    );
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(submitForm({ ...form, orderList }));
+  };
 
   return (
     isOpen && (
@@ -21,19 +39,23 @@ export const ModalDelivery = () => {
           <div className={style.container}>
             <h2 className={style.title}>Доставка</h2>
 
-            <form className={style.form} id="delivery">
+            <form className={style.form} id="delivery" onSubmit={handleSubmit}>
               <fieldset className={style.fieldset}>
                 <input
                   className={style.input}
                   type="text"
                   name="name"
+                  value={form.name}
                   placeholder="Ваше имя"
+                  onChange={hahdleInputChange}
                 />
                 <input
                   className={style.input}
                   type="tel"
                   name="phone"
+                  value={form.phone}
                   placeholder="Телефон"
+                  onChange={hahdleInputChange}
                 />
               </fieldset>
 
@@ -44,6 +66,8 @@ export const ModalDelivery = () => {
                     type="radio"
                     name="format"
                     value="pickup"
+                    checked={form.format === "pickup"}
+                    onChange={hahdleInputChange}
                   />
                   <span>Самовывоз</span>
                 </label>
@@ -54,32 +78,41 @@ export const ModalDelivery = () => {
                     type="radio"
                     name="format"
                     value="delivery"
-                    checked
+                    checked={form.format === "delivery"}
+                    onChange={hahdleInputChange}
                   />
                   <span>Доставка</span>
                 </label>
               </fieldset>
 
-              <fieldset className={style.fieldset}>
-                <input
-                  className={style.input}
-                  type="text"
-                  name="address"
-                  placeholder="Улица, дом, квартира"
-                />
-                <input
-                  className={classNames(style.input, style.input_half)}
-                  type="number"
-                  name="floor"
-                  placeholder="Этаж"
-                />
-                <input
-                  className={classNames(style.input, style.input_half)}
-                  type="number"
-                  name="intercom"
-                  placeholder="Домофон"
-                />
-              </fieldset>
+              {form.format === "delivery" && (
+                <fieldset className={style.fieldset}>
+                  <input
+                    className={style.input}
+                    type="text"
+                    name="address"
+                    value={form.address}
+                    onChange={hahdleInputChange}
+                    placeholder="Улица, дом, квартира"
+                  />
+                  <input
+                    className={classNames(style.input, style.input_half)}
+                    type="number"
+                    name="floor"
+                    value={form.floor}
+                    placeholder="Этаж"
+                    onChange={hahdleInputChange}
+                  />
+                  <input
+                    className={classNames(style.input, style.input_half)}
+                    type="number"
+                    name="intercom"
+                    value={form.intercom}
+                    placeholder="Домофон"
+                    onChange={hahdleInputChange}
+                  />
+                </fieldset>
+              )}
             </form>
 
             <button className={style.submit} type="submit" form="delivery">
